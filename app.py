@@ -397,7 +397,7 @@ with col1:
                     rag_tool.add(local_path,data_type=source_type)
                 elif doc["type"] == "web_page":
                     # Fix the web page handling
-                    rag_tool.add(data_type="pdf_file",url=doc["url"])
+                    rag_tool.add(source = "",data_type="pdf_file",url=doc["url"])
             
             # Update progress
             status_text.text("Analyzing your query...")
