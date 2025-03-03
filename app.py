@@ -380,7 +380,7 @@ with col1:
                     else:
                         source_type = "document"  # default source type
                         
-                    rag_tool.add(source=source_type, data_type="file", path=doc["path"])
+                    rag_tool.add(source=source_type, data_type="file")
                 elif doc["type"] == "web_page":
                      rag_tool.add(doc["url"],data_type="web_page")
             
