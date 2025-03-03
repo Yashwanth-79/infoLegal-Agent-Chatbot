@@ -150,10 +150,9 @@ def process_query(query_text):
     }
 
     # Setup knowledge source
-    base_dir = pathlib.Path(__file__).parent.resolve()
     file_paths = [
-        str((base_dir / "knowledge" / "Guide-to-Litigation-in-India.pdf").resolve()),
-        str((base_dir / "knowledge" / "PDFFile5b28c9ce64e524.54675199.pdf").resolve())
+     "Guide-to-Litigation-in-India.pdf",
+       "PDFFile5b28c9ce64e524.54675199.pdf"
     ]
     content_source = PDFKnowledgeSource(file_paths=file_paths)
 
