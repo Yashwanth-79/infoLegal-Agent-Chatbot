@@ -3,3 +3,4 @@ crewai[tools]
 python-dotenv
 docling
 pysqlite3-binary
+markdown
