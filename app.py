@@ -361,6 +361,7 @@ with col1:
             progress_bar.progress(30)
             
             # Add documents to RAG tool - FIXED with source parameter
+            # Add documents to RAG tool
             for doc in st.session_state.documents:
                 if doc["type"] == "file":
                     # Determine the source type based on file extension
@@ -379,10 +380,15 @@ with col1:
                         source_type = "mdx"
                     else:
                         source_type = "document"  # default source type
-                        
-                    rag_tool.add(source=source_type, data_type="file")
+                    
+                    # Get absolute path to ensure the file is found
+                    local_path = os.path.abspath(doc["path"])
+                    
+                    # Add file with local path
+                    rag_tool.add(source=source_type, data_type="file", path=local_path)
                 elif doc["type"] == "web_page":
-                     rag_tool.add(doc["url"],data_type="web_page")
+                    # Fix the web page handling
+                    rag_tool.add(data_type="web_page", url=doc["url"])
             
             # Update progress
             status_text.text("Analyzing your query...")
