@@ -380,7 +380,7 @@ with col1:
                         
                     rag_tool.add(source=source_type, data_type="file", path=doc["path"])
                 elif doc["type"] == "web_page":
-                    rag_tool.add(""NIL",data_type="web_page", url=doc["url"])
+                    rag_tool.add("NIL",data_type="web_page", url=doc["url"])
             
             # Update progress
             status_text.text("Analyzing your query...")
