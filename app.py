@@ -171,8 +171,8 @@ st.markdown("""
 
 # Logo and title
 st.markdown("""
-<div class="app-header">
-    <div class="app-logo">⚖️</div>
+<div class="legal-header">
+    <img src="https://w7.pngwing.com/pngs/254/724/png-transparent-lawyer-statute-legislature-procedural-law-lawyers-silhouette-people-logo-man-silhouette.png" alt="InfoLegal Logo">
     <h1>InfoLegal Agent</h1>
 </div>
 """, unsafe_allow_html=True)
@@ -366,7 +366,7 @@ with col1:
                     # Determine the source type based on file extension
                     file_type = doc.get("file_type", "").lower()
                     if file_type == "pdf":
-                        source_type = "pdf"
+                        source_type = "pdf_file"
                     elif file_type == "docx":
                         source_type = "docx"
                     elif file_type == "txt":
@@ -375,12 +375,14 @@ with col1:
                         source_type = "csv"
                     elif file_type == "json":
                         source_type = "json"
+                    elif file_type == "mdx":
+                        source_type = "mdx"
                     else:
                         source_type = "document"  # default source type
                         
                     rag_tool.add(source=source_type, data_type="file", path=doc["path"])
                 elif doc["type"] == "web_page":
-                     rag_tool.add(source="website", data_type="web_page", url=doc["url"])
+                     rag_tool.add(doc["url"],data_type="web_page")
             
             # Update progress
             status_text.text("Analyzing your query...")
