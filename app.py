@@ -385,7 +385,7 @@ with col1:
                     local_path = os.path.abspath(doc["path"])
                     
                     # Add file with local path
-                    rag_tool.add(local_path,data_type="file")
+                    rag_tool.add(local_path,data_type=source_type)
                 elif doc["type"] == "web_page":
                     # Fix the web page handling
                     rag_tool.add(data_type="web_page", url=doc["pdf_file"])
