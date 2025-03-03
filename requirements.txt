@@ -1,5 +1,5 @@
-crew
-crew[tools]
+crewai
+crewai[tools]
 python-dotenv
 docling
 
