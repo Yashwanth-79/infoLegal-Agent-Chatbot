@@ -385,10 +385,10 @@ with col1:
                     local_path = os.path.abspath(doc["path"])
                     
                     # Add file with local path
-                    rag_tool.add(data_type="file",path=local_path)
+                    rag_tool.add(local_pathdata_type="file")
                 elif doc["type"] == "web_page":
                     # Fix the web page handling
-                    rag_tool.add(data_type="web_page", url=doc["url"])
+                    rag_tool.add(data_type="web_page", url=doc["pdf_file"])
             
             # Update progress
             status_text.text("Analyzing your query...")
