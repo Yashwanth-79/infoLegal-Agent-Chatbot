@@ -159,7 +159,6 @@ def process_query(query_text):
         memory=True,
         respect_context_window=True,
         use_system_prompt=True,
-        cache=True,
         system_template=query_template.system_template,
         prompt_template=query_template.prompt_template,
         response_template=query_template.response_template,
@@ -176,7 +175,6 @@ def process_query(query_text):
         memory=True,
         respect_context_window=True,
         use_system_prompt=True,
-        cache=True,
         system_template=summarization_template.system_template,
         prompt_template=summarization_template.prompt_template,
         response_template=summarization_template.response_template,
@@ -246,8 +244,7 @@ def process_query(query_text):
         tasks=[query_task, summarization_task],
         process=Process.sequential,
         knowledge_sources=content_source,
-        memory=True,
-        cache=True
+        memory=True
     )
     
     # Process the query
