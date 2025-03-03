@@ -5,3 +5,7 @@ docling
 pysqlite3-binary
 markdown
 google-generativeai
+langchain_huggingface
+langchain_community
+langchain
+langchain_core
