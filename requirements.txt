@@ -1,3 +1,6 @@
-git remote add origin https://github.com/Yashwanth-79/infoLegal-Agent-Chatbot.git
-git branch -M main
-git push -u origin main
+crew
+crew[tools]
+python-dotenv
+docling
+
+
