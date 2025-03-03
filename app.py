@@ -1,10 +1,11 @@
 __import__('pysqlite3')
 import sys
+import streamlit as st
+import os
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 os.environ["STREAMLIT_SERVER_MODULE_WATCHER_DISABLE_MODULES"] = "torch,transformers,langchain"
 
-import streamlit as st
-import os
+
 import json
 import markdown
 import base64
