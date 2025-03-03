@@ -4,3 +4,4 @@ python-dotenv
 docling
 pysqlite3-binary
 markdown
+google-generativeai
