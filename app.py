@@ -229,7 +229,7 @@ with st.sidebar:
         else:  # Web URL
             url_input = st.text_input(
                 "Website URL",
-                placeholder="https://example.com"
+                placeholder="https://example.com/axy.pdf"
             )
             
             add_url = st.button("Add URL", use_container_width=True)
@@ -248,17 +248,17 @@ with st.sidebar:
         if st.session_state.documents:
             st.markdown("#### Current Documents")
             
-            for i, doc in enumerate(st.session_state.documents):
+            for i, doc in list(enumerate(st.session_state.documents)):  # Iterate over a copy
                 st.markdown(f"""
                 <div class="doc-list-item">
                     <span>{'📄' if doc['type'] == 'file' else '🌐'} {doc['name']}</span>
                 </div>
                 """, unsafe_allow_html=True)
-                
+            
                 col1, col2 = st.columns([1, 1])
                 with col1:
-                    if st.button("Remove", key=f"remove_{i}", use_container_width=True):
-                        st.session_state.documents.pop(i)
+                    if st.button(f"Remove {i}", key=f"remove_{i}", use_container_width=True):
+                        del st.session_state.documents[i]  # Safe deletion
                         st.experimental_rerun()
             
             if st.button("Clear All", use_container_width=True):
