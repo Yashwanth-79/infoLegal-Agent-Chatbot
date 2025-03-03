@@ -138,13 +138,6 @@ def main():
 def process_query(query_text):
     # Setup LLM
     llm = LLM(model="gemini/gemini-1.5-pro", api_key=os.environ.get("GEMINI_API_KEY"))
-    embedder = {
-        "provider": "google",
-        "config": {
-            "model": "models/text-embedding-004",
-            "api_key": os.environ.get("GEMINI_API_KEY")
-        }
-    }
 
     # Setup knowledge source
     base_dir = pathlib.Path(__file__).parent.resolve()
@@ -170,8 +163,7 @@ def process_query(query_text):
         system_template=query_template.system_template,
         prompt_template=query_template.prompt_template,
         response_template=query_template.response_template,
-        knowledge_sources=content_source,
-        embedder=embedder
+        knowledge_sources=content_source
     )
 
     summarization_agent = Agent(
@@ -255,8 +247,7 @@ def process_query(query_text):
         process=Process.sequential,
         knowledge_sources=content_source,
         memory=True,
-        cache=True,
-        embedder=embedder
+        cache=True
     )
     
     # Process the query
