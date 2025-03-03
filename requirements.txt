@@ -1,0 +1,4 @@
+crew
+crew[tools]
+python-dotenv
+docling
