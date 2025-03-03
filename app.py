@@ -5,6 +5,12 @@ import os
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 os.environ["STREAMLIT_SERVER_MODULE_WATCHER_DISABLE_MODULES"] = "torch,transformers,langchain"
 
+import asyncio
+
+try:
+    asyncio.get_running_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
 import json
 import markdown
