@@ -1,6 +1,4 @@
 from crewai import LLM, Agent, Crew, Process, Task
-from crewai.knowledge.source.pdf_knowledge_source import PDFKnowledgeSource
-from templates import query_template,summarization_template
 import os
 import markdown
 import json
@@ -50,8 +48,8 @@ query_agent = Agent(
     respect_context_window=True, 
     cache=True,
     memory=True,
-    verbose=True
-     
+    verbose=True,
+    tools=[rag_tool]
 )
 
 
@@ -65,7 +63,8 @@ summarization_agent = Agent(
     memory=True, 
     respect_context_window=True, 
     cache=True,
-    verbose=True
+    verbose=True,
+    tools=[rag_tool]
     
   
 )
@@ -93,7 +92,7 @@ query_task = Task(
           ]
         }
     """,
-    agent=query_agent
+    agent=query_agent,tools=[rag_tool]
 
 )
 
@@ -127,7 +126,7 @@ summarization_task = Task(
         Step 4: Attend hearings and follow court procedures.
         Would you like more details on any step?
     """,
-    agent=summarization_agent,
+    agent=summarization_agent,tools=[rag_tool],
     context=[query_task],
     output_file= "summarization.md"
 )
@@ -135,7 +134,7 @@ summarization_task = Task(
 
 crew = Crew(
     agents=[query_agent, summarization_agent],
-    verbose=True,
+    verbose=True,memory=True,
     tasks=[query_task, summarization_task],
     process=Process.sequential,chat_llm= LLM(
     model="gemini/gemini-1.5-pro",api_key=os.environ.get("GEMINI_API_KEY"),
