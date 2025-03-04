@@ -1,4 +1,4 @@
-```markdown
+
 # 🏛️ Legal Research Assistant
 
 ## Overview
@@ -120,4 +120,4 @@ Project Link: [https://github.com/yourusername/legal-research-assistant](https:/
 ---
 
 **Disclaimer**: This tool is for informational purposes and should not be considered legal advice. Always consult with a qualified legal professional for specific legal guidance.
-```
+
