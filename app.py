@@ -25,24 +25,23 @@ def initialize_crew(pdf_sources):
 
     # Initialize LLM
     llm = LLM(
-        model="gemini/gemini-1.5-pro",
-        api_key=os.environ.get("GEMINI_API_KEY"),
-        temperature=0.25
+        model="groq/llama-3.3-70b-versatile",
+        temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
     )
 
     # Configure RAG Tool
     config = {
         "llm": {
-            "provider": "google",
+            "provider": "groq",
             "config": {
-                "model": "gemini-1.5-pro",
-                "api_key": os.environ.get("GEMINI_API_KEY"), 
+                "model": "llama-3.3-70b-versatile",
+                "api_key": os.environ.get("GROQ_API_KEY"), 
             }
         },
         "embedder": {
-            "provider": "google",
+            "provider": "huggingface",
             "config": {
-                "model": "models/text-embedding-004",
+                "model": "SentenceTransformer/all-MiniLM-L6-v2",
             }
         }
     }
@@ -159,8 +158,8 @@ def initialize_crew(pdf_sources):
         tasks=[query_task, summarization_task],
         process=Process.sequential,
         chat_llm=LLM(
-            model="gemini/gemini-1.5-pro",
-            api_key=os.environ.get("GEMINI_API_KEY"),
+            model="groq/llama-3.3-70b-versatile",
+            api_key=os.environ.get("GROQ_API_KEY"),
             temperature=0.25
         )
     )
@@ -243,7 +242,7 @@ def main():
 
     # Chat input in main column
     with main_col:
-        query = st.chat_input("Ask a legal question about Indian law...")
+        query = st.chat_input("Enter your query here...")
         
         if query:
             # Initialize and run crew
