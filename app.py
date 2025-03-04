@@ -41,7 +41,7 @@ def initialize_crew(pdf_sources):
         "embedder": {
             "provider": "huggingface",
             "config": {
-                "model": "SentenceTransformer/all-MiniLM-L6-v2",
+                "model": "sentence-transformers/all-MiniLM-L12-v2",
             }
         }
     }
