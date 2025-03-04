@@ -9,3 +9,4 @@ langchain_huggingface
 langchain_community
 langchain
 langchain_core
+lamgchain-groq
