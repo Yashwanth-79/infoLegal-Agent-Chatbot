@@ -1,5 +1,5 @@
 
-# 🏛️ Legal Research Assistant
+# 🏛️info-Legal-Agent : Legal Research Assistant
 
 ## Overview
 
