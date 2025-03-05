@@ -24,11 +24,10 @@ def initialize_crew(pdf_sources):
     load_dotenv()
 
     # Initialize LLM
-    llm = LLM(
-        model="gemini/gemini-1.5-pro",
-        api_key=os.environ.get("GEMINI_API_KEY"),
-        temperature=0.25
-    )
+    llm= LLM(
+        model="groq/llama-3.3-70b-versatile",
+        temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
+        )
 
     # Configure RAG Tool
     config = {
@@ -158,11 +157,10 @@ def initialize_crew(pdf_sources):
         verbose=True,
         tasks=[query_task, summarization_task],
         process=Process.sequential,
-        chat_llm=LLM(
-            model="gemini/gemini-1.5-pro",
-            api_key=os.environ.get("GEMINI_API_KEY"),
-            temperature=0.25
-        )
+        chat_llm=chat_llm= LLM(
+        model="groq/llama-3.3-70b-versatile",
+        temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
+            )
     )
 
     return crew
