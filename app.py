@@ -98,21 +98,10 @@ def initialize_crew(pdf_sources):
         Provide in details.
     """,
     expected_output="""
-        A in-detail text containing the original user query and a list of results.  
-        Each result should include the document title, a full citation (section, chapter, page,content, etc.),
-        and the exact text of the relevant section.  Follow this format:
-        with available use LLM ouput and knowledge source
-        {
-          "query": "<User's original query>",
-          "results": [
-            {
-              "document": "<Document Title>",
-              "citation": "<Full Citation (Section, Chapter, Page, etc.)>",
-              "extract": "<Exact text of the relevant section>"
-              "in detail info": <info>
-            },
-          ]
-        }
+        A text containing the original user query and a list of results.  
+        Each result should include the document title, a important details (section, chapter, page,content, etc.),
+        Use your knoledge too
+        and the exact text of the relevant section. 
     """,
     agent=query_agent,tools=[rag_tool]
 
@@ -123,25 +112,18 @@ def initialize_crew(pdf_sources):
     summarization_task = Task(
         description="""
             Take the output from the Legal Information Retrieval Specialist (Query Agent) and 
-            transform it into a clear, step wise, and easy-to-understand summary.  
+            transform it into a clear, step wise, and easy-to-understand brief summary.  
             Preserve the original legal meaning and accuracy.  
             Replace legal jargon with plain language where possible.
             Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
             Conclude by offering to provide more details.
         """,
         expected_output="""
-            A plain text in detail summary of the legal information, 
+            A plain text in detail brief summary of the legal information, 
             Replace legal jargon with plain language where possible.
             Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
             followed by a question prompting the user
             if they want more details. For example:
-
-            Filing a lawsuit in India involves preparing legal documents, submitting a petition in court,
-            serving a notice to the opposing party, and attending hearings.
-            and its details explaining in detail
-            ...
-            ...
-            ...
             like Converts legal terms into simple steps:
             example:
             Step 1: Prepare necessary documents.
@@ -165,7 +147,7 @@ def initialize_crew(pdf_sources):
     )
 
     return crew
-
+st.
 def save_history(query, result):
     """Save query history"""
     history_file = f"history/query_{len(os.listdir('history'))+1}.md"
@@ -268,9 +250,9 @@ def main():
                 )
 
     # History column
-    with history_col:
+    with st.session_state.history_col:
         st.header("Query History")
-        histories = load_history()
+        histories = st.session_state.load_history()
         
         for i, history in enumerate(histories, 1):
             with st.expander(f"Query {len(histories)-i+1}"):
