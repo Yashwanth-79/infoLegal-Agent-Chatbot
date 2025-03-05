@@ -147,7 +147,7 @@ def initialize_crew(pdf_sources):
     )
 
     return crew
-st.
+
 def save_history(query, result):
     """Save query history"""
     history_file = f"history/query_{len(os.listdir('history'))+1}.md"
