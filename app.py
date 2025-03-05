@@ -24,27 +24,32 @@ def initialize_crew(pdf_sources):
     load_dotenv()
 
     # Initialize LLM
-    llm= LLM(
+    llm = LLM(
         model="groq/llama-3.3-70b-versatile",
-        temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
-        )
+        api_key=os.environ.get("GROQ_API_KEY"),
+        temperature=0.25,max_tokens=8192
+     )
 
     # Configure RAG Tool
-    config = {
-        "llm": {
-            "provider": "google",
-            "config": {
-                "model": "gemini-1.5-pro",
-                "api_key": os.environ.get("GEMINI_API_KEY"), 
-            }
-        },
-        "embedder": {
-            "provider": "google",
-            "config": {
-                "model": "models/text-embedding-004",
-            }
-        }
-    }
+    config=dict(
+    llm=dict(
+        provider="groq", 
+        config=dict(
+            model="llaama-3.3-70b-versatile",
+                temperature=0.25,api_key=os.environ.get("GROQ_API_KEY"),max_tokens=8192
+
+        ),
+    ),
+    embedder=dict(
+        provider="google", 
+        config=dict(
+            model="models/text-embedding-004",
+            task_type="retrieval_document",
+            # title="Embeddings",
+        ),
+    ),
+    )
+
 
     # Setup RAG Tool
     rag_tool = RagTool(config=config)
@@ -157,10 +162,6 @@ def initialize_crew(pdf_sources):
         verbose=True,
         tasks=[query_task, summarization_task],
         process=Process.sequential,
-        chat_llm=LLM(
-        model="groq/llama-3.3-70b-versatile",
-        temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
-            )
     )
 
     return crew
