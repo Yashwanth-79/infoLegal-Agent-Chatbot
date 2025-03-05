@@ -1,18 +1,11 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import streamlit as st
 import os
 import json
 import markdown
 from dotenv import load_dotenv
-
+import shutil
 from crewai import LLM, Agent, Crew, Process, Task
 from crewai_tools import RagTool
-import os
-import markdown
-import json
-from dotenv import load_dotenv
 import pathlib
 
 # Ensure directories exist
@@ -27,29 +20,29 @@ def initialize_crew(pdf_sources):
     llm = LLM(
         model="groq/llama-3.3-70b-versatile",
         api_key=os.environ.get("GROQ_API_KEY"),
-        temperature=0.25,max_tokens=8192
-     )
-
-    # Configure RAG Tool
-    config=dict(
-    llm=dict(
-        provider="groq", 
-        config=dict(
-            model="llaama-3.3-70b-versatile",
-                temperature=0.25,api_key=os.environ.get("GROQ_API_KEY"),max_tokens=8192
-
-        ),
-    ),
-    embedder=dict(
-        provider="google", 
-        config=dict(
-            model="models/text-embedding-004",
-            task_type="retrieval_document",
-            # title="Embeddings",
-        ),
-    ),
+        temperature=0.25,
+        max_tokens=32768
     )
 
+    # Configure RAG Tool
+    config = {
+        'llm': {
+            'provider': 'groq', 
+            'config': {
+                'model': 'llama-3.3-70b-versatile',
+                'temperature': 0.25,
+                'api_key': os.environ.get("GROQ_API_KEY"),
+                'max_tokens': 32768
+            }
+        },
+        'embedder': {
+            'provider': 'google', 
+            'config': {
+                'model': 'models/text-embedding-004',
+                'task_type': 'retrieval_document'
+            }
+        }
+    }
 
     # Setup RAG Tool
     rag_tool = RagTool(config=config)
@@ -59,116 +52,149 @@ def initialize_crew(pdf_sources):
     # Query Agent
     query_agent = Agent(
         role="Legal Information Retrieval Specialist - India Focus",
-        goal=" Efficiently and accurately retrieve relevant sections from Indian legal documents",
-        backstory="You are a highly specialized AI agent with deep indexing and search capabilities within a specific corpus of Indian legal texts."
-        "You understand legal terminology and can quickly pinpoint the most relevant passages, sections, and clauses related to a user's natural language query."
-        "You prioritize precision and recall, ensuring that all potentially relevant information is identified" 
-        "while minimizing irrelevant results. You are optimized for speed and accuracy in a legal context..",
+        goal="Efficiently and accurately retrieve relevant sections from Indian legal documents",
+        backstory="You are a highly specialized AI agent with deep indexing and search capabilities within a specific corpus of Indian legal texts. "
+        "You understand legal terminology and can quickly pinpoint the most relevant passages, sections, and clauses related to a user's natural language query. "
+        "while minimizing irrelevant results. You are optimized for speed and accuracy in a legal context.",
         llm=llm,
-        respect_context_window=True, 
+      
         cache=True,
-        memory=True,
         verbose=True,
         tools=[rag_tool]
     )
 
-
     summarization_agent = Agent(
-        role="Legal Text Simplification and Explanation Expert",
+        role="Legal Text Simplification and  brief summarizer Expert",
         goal="Transform complex legal passages into clear, concise, and easy-to-understand summaries, preserving accuracy.",
-        backstory="You are an advanced AI agent trained in legal text summarization and simplification. You understand legal principles and can explain complex concepts in plain language."
-        "You prioritize making legal information accessible to non-experts without losing crucial details or introducing inaccuracies."
+        backstory="You are an advanced AI agent trained in legal text summarization and simplification. You understand legal principles and can explain complex concepts in plain language. "
+        "You prioritize making legal information accessible to non-experts without losing crucial details or introducing inaccuracies. "
         "You are adept at handling legal jargon and converting it into understandable terms. You can structure summaries logically.",
         llm=llm, 
         memory=True, 
-        respect_context_window=True, 
+        
         cache=True,
         verbose=True,
         tools=[rag_tool]
-        
-    
     )
-
 
     # Query Task
     query_task = Task(
-    description="""
+        description="""
         Retrieve relevant sections from Indian legal documents based on the user's query.
-        Focus on accuracy and completeness.  Find ALL relevant sections, passages, and clauses.
+        Focus on accuracy and completeness. Find ALL relevant sections, passages, and clauses.
         Provide in details.
-    """,
-    expected_output="""
-        A text containing the original user query and a list of results.  
-        Each result should include the document title, a important details (section, chapter, page,content, etc.),
-        Use your knoledge too
-        and the exact text of the relevant section. 
-    """,
-    agent=query_agent,tools=[rag_tool]
-
+        """,
+        expected_output="""
+        A detailed text containing the original user query and a list of results.  
+        Each result should include the document title, a full citation (section, chapter, page, content, etc.),
+        and the exact text of the relevant section.
+        """,
+        agent=query_agent,
+        tools=[rag_tool]
     )
-
 
     # Summarization Task
     summarization_task = Task(
         description="""
-            Take the output from the Legal Information Retrieval Specialist (Query Agent) and 
-            transform it into a clear, step wise, and easy-to-understand brief summary.  
-            Preserve the original legal meaning and accuracy.  
-            Replace legal jargon with plain language where possible.
-            Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
-            Conclude by offering to provide more details.
+        Take the output from the Legal Information Retrieval Specialist (Query Agent) and 
+        transform it into a clear, step-wise, and easy-to-understand summary.  
+        Replace legal jargon with plain language where possible.
+        Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
+        Conclude by offering to provide more details.
         """,
         expected_output="""
-            A plain text in detail brief summary of the legal information, 
-            Replace legal jargon with plain language where possible.
-            Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
-            followed by a question prompting the user
-            if they want more details. For example:
-            like Converts legal terms into simple steps:
-            example:
-            Step 1: Prepare necessary documents.
-            Step 2: File a petition in court.
-            Step 3: Serve notice to the opposing party.
-            Step 4: Attend hearings and follow court procedures.
-            Would you like more details on any step?
+        A plain text in-detail summary of the legal information, 
+        Structure the summary logically (e.g., using bullet points or numbered steps if appropriate).
+        Provide a clear, formatted response with:
+        
+        # Query Summary
+        
+        ## Key Findings
+        
+        ### Step-by-Step Breakdown
+        
+        ## Important Insights
+    
+        
+        ## Conclusion
+        Brief wrap-up of the legal information
+        
+        Would you like more details on any specific aspect?
         """,
-        agent=summarization_agent,tools=[rag_tool],
-        context=[query_task],
-        output_file= "summarization.md"
+        agent=summarization_agent,
+        tools=[rag_tool],
+        
+        output_file="summarization.md"
     )
-
 
     # Create Crew
     crew = Crew(
         agents=[query_agent, summarization_agent],
-        verbose=True,
         tasks=[query_task, summarization_task],
-        process=Process.sequential,
+        
     )
 
     return crew
 
-def save_history(query, result):
-    """Save query history"""
-    history_file = f"history/query_{len(os.listdir('history'))+1}.md"
+def save_user_history(user_id, query, result):
+    """Save query history for a specific user"""
+    user_history_dir = os.path.join('history', user_id)
+    os.makedirs(user_history_dir, exist_ok=True)
+    
+    history_file = os.path.join(user_history_dir, f"query_{len(os.listdir(user_history_dir))+1}.md")
     with open(history_file, 'w') as f:
         f.write(f"# Query: {query}\n\n{result}")
 
-def load_history():
-    """Load last 10 history files"""
+def load_user_history(user_id):
+    """Load last 10 history files for a specific user"""
+    user_history_dir = os.path.join('history', user_id)
+    
+    if not os.path.exists(user_history_dir):
+        return []
+    
     history_files = sorted(
-        [f for f in os.listdir('history') if f.endswith('.md')], 
+        [f for f in os.listdir(user_history_dir) if f.endswith('.md')], 
         reverse=True
     )[:10]
     
     histories = []
     for file in history_files:
-        with open(os.path.join('history', file), 'r') as f:
+        with open(os.path.join(user_history_dir, file), 'r') as f:
             histories.append(f.read())
     
     return histories
-
+def clear_user_history(user_id):
+    """
+    Clear the entire history directory for a specific user
+    
+    Args:
+        user_id (str): Unique identifier for the user
+    """
+    user_history_dir = os.path.join('history', user_id)
+    
+    try:
+        # Use shutil.rmtree instead of os.shutil.rmtree
+        if os.path.exists(user_history_dir):
+            shutil.rmtree(user_history_dir)
+        
+        # Recreate the directory to ensure it exists
+        os.makedirs(user_history_dir, exist_ok=True)
+        
+        st.success("Query history has been cleared successfully!")
+    except Exception as e:
+        st.error(f"Error clearing history: {e}")
 def main():
+    # Initialize session state for user
+    if 'user_id' not in st.session_state:
+        st.session_state.user_id = str(hash(st.session_state.get('_id', '')))
+    
+    # Initialize session state for sources
+    if 'sources' not in st.session_state:
+        st.session_state.sources = [
+            "https://kb.icai.org/pdfs/PDFFile5b28c9ce64e524.54675199.pdf",
+            "https://www.cyrilshroff.com/wp-content/uploads/2020/09/Guide-to-Litigation-in-India.pdf"
+        ]
+
     # Page configuration
     st.set_page_config(
         page_title="Legal Research Assistant", 
@@ -176,19 +202,10 @@ def main():
         layout="wide"
     )
 
-    # Default PDF sources
-    default_sources = [
-        "https://kb.icai.org/pdfs/PDFFile5b28c9ce64e524.54675199.pdf",
-        "https://www.cyrilshroff.com/wp-content/uploads/2020/09/Guide-to-Litigation-in-India.pdf"
-    ]
-
-    # Initialize session state for sources
-    if 'sources' not in st.session_state:
-        st.session_state.sources = default_sources.copy()
-
     # Sidebar with logo and source management
     st.sidebar.title("PDF Sources")
-    st.sidebar.markdown("Add PDFs or URLs to expand the legal knowledge base.\n Then ask a your query .")
+    st.sidebar.markdown("Add PDFs or URLs to expand the legal knowledge base.\nThen ask your query.")
+    
     # PDF source management
     for i, source in enumerate(st.session_state.sources):
         col1, col2 = st.sidebar.columns([3, 1])
@@ -198,7 +215,8 @@ def main():
             if st.sidebar.button(f"Remove Source {i+1}", key=f"remove_{i}"):
                 st.session_state.sources.pop(i)
                 st.rerun()
-    
+
+
     # PDF Upload
     uploaded_file = st.sidebar.file_uploader("Upload PDF", type=['pdf'])
     if uploaded_file is not None:
@@ -228,17 +246,19 @@ def main():
         
         if query:
             # Initialize and run crew
-            with st.spinner('Analyzing documents...This would take a few seconds'):
-               
+            with st.spinner('Analyzing documents...This may take a few seconds'):
                 crew = initialize_crew(st.session_state.sources)
                 result = crew.kickoff(inputs={'topic': query})
                
-                # Save history
-                save_history(query, result)
+                # Save user-specific history
+                save_user_history(st.session_state.user_id, query, result)
                 
-                # Display result
+                # Formatted result display
+                st.markdown("## Query Results")
+                
+                
+                st.write(result)
                 st.write(result.raw)
-                
                 # Summarization file download
                 with open('summarization.md', 'r') as f:
                     summary = f.read()
@@ -252,7 +272,7 @@ def main():
     # History column
     with history_col:
         st.header("Query History")
-        histories = st.session_state.load_history()
+        histories = load_user_history(st.session_state.user_id)
         
         for i, history in enumerate(histories, 1):
             with st.expander(f"Query {len(histories)-i+1}"):
@@ -268,6 +288,11 @@ def main():
                     mime="text/markdown",
                     key=f"download_{i}"
                 )
+    if st.sidebar.button("🗑️ Clear Query History", key="clear_history"):
+        
+        
+        clear_user_history(st.session_state.user_id)
+        st.rerun()
 
 if __name__ == "__main__":
     main()
