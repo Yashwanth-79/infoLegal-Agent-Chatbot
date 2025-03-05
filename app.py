@@ -250,7 +250,7 @@ def main():
                 )
 
     # History column
-    with st.session_state.history_col:
+    with history_col:
         st.header("Query History")
         histories = st.session_state.load_history()
         
