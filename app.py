@@ -157,7 +157,7 @@ def initialize_crew(pdf_sources):
         verbose=True,
         tasks=[query_task, summarization_task],
         process=Process.sequential,
-        chat_llm=chat_llm= LLM(
+        chat_llm=LLM(
         model="groq/llama-3.3-70b-versatile",
         temperature=0.25,api_key = os.environ.get("GROQ_API_KEY")
             )
